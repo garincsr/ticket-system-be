@@ -1,0 +1,17 @@
+package com.st_carollus.ticket_system.controller;
+
+@RestController
+@RequestMapping(APIUrl.AUTH_API)
+@RequiredArgsConstructor
+public class AuthController {
+
+    private final AuthService authService;
+
+    @PostMapping("/login")
+    public ResponseEntity<ApiResponse<LoginResponse>> login(@Valid @RequestBody LoginRequest request) {
+        LoginResponse response = authService.login(request);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(ApiResponse.of(HttpStatus.OK.value(), response));
+    }
+}

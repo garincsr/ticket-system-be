@@ -20,7 +20,7 @@ public class UserRequest {
     private String fullName;
 
     @NotBlank(message = "Password is required")
-    private String passwordHash;
+    private String password;
 
     private Boolean isActive;
 

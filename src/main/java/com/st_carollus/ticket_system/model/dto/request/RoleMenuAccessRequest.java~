@@ -1,7 +1,6 @@
 package com.st_carollus.ticket_system.model.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -14,15 +13,15 @@ public class RoleMenuAccessRequest {
     @NotBlank(message = "Menu Code is required")
     private String menuCode;
 
-    @NotNull(message = "Can View is required")
+    @NotBlank(message = "Can View is required")
     private Boolean canView;
 
-    @NotNull(message = "Can Create is required")
+    @NotBlank(message = "Can Create is required")
     private Boolean canCreate;
 
-    @NotNull(message = "Can Edit is required")
+    @NotBlank(message = "Can Edit is required")
     private Boolean canEdit;
 
-    @NotNull(message = "Can Delete is required")
+    @NotBlank(message = "Can Delete is required")
     private Boolean canDelete;
 }

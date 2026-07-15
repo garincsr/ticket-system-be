@@ -3,7 +3,6 @@ package com.st_carollus.ticket_system.controller;
 import com.st_carollus.ticket_system.constant.APIUrl;
 import com.st_carollus.ticket_system.model.dto.request.RoleMenuAccessRequest;
 import com.st_carollus.ticket_system.model.dto.response.ApiResponse;
-import com.st_carollus.ticket_system.model.dto.response.RoleMenuAccessGroupedResponse;
 import com.st_carollus.ticket_system.model.dto.response.RoleMenuAccessResponse;
 import com.st_carollus.ticket_system.model.entity.RoleMenuAccess;
 import com.st_carollus.ticket_system.service.RoleMenuAccessService;
@@ -31,10 +30,10 @@ public class RoleMenuAccessController {
     }
 
     @GetMapping("/{roleCode}")
-    public ResponseEntity<ApiResponse<RoleMenuAccessGroupedResponse>> getByRoleCode(@PathVariable String roleCode) {
+    public ResponseEntity<ApiResponse<List<RoleMenuAccess>>> getByRoleCode(@PathVariable String roleCode) {
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(ApiResponse.of(HttpStatus.OK.value(), roleMenuAccessService.getByRoleCode(roleCode)));
+                .body(ApiResponse.of(HttpStatus.OK.value(), roleMenuAccessService.getEntityByRoleCode(roleCode)));
     }
 
     @PutMapping("/{id}")

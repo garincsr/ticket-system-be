@@ -2,7 +2,9 @@ package com.st_carollus.ticket_system.service.impl;
 
 import com.st_carollus.ticket_system.exception.ResourceNotFoundException;
 import com.st_carollus.ticket_system.model.dto.request.RoleMenuAccessRequest;
+import com.st_carollus.ticket_system.model.dto.response.RoleMenuAccessGroupedResponse;
 import com.st_carollus.ticket_system.model.dto.response.RoleMenuAccessResponse;
+import com.st_carollus.ticket_system.model.dto.response.RoleResponse;
 import com.st_carollus.ticket_system.model.entity.Menu;
 import com.st_carollus.ticket_system.model.entity.Role;
 import com.st_carollus.ticket_system.model.entity.RoleMenuAccess;
@@ -26,8 +28,13 @@ public class RoleMenuAccessServiceImpl implements RoleMenuAccessService {
 
     @Override
     public RoleMenuAccessResponse create(RoleMenuAccessRequest request) {
+        System.out.println(">>> CREATEEE <<<");
+
         Role role = roleService.getEntityByRoleCode(request.getRoleCode());
+        System.out.println("Role ===> " + role.getRoleCode());
+
         Menu menu = menuService.getEntityByMenuCode(request.getMenuCode());
+        System.out.println("Menu ===> " + menu.getMenuCode());
 
         RoleMenuAccess roleMenuAccess = RoleMenuAccess.builder()
                 .role(role)
@@ -42,9 +49,39 @@ public class RoleMenuAccessServiceImpl implements RoleMenuAccessService {
     }
 
     @Override
-    public List<RoleMenuAccess> getEntityByRoleCode(String roleCode) {
-        String roleId = roleService.getEntityByRoleCode(roleCode).getId();
-        return findEntityByRoleId(roleId);
+    public RoleMenuAccessGroupedResponse getByRoleCode(String roleCode) {
+        Role role = roleService.getEntityByRoleCode(roleCode);
+        List<RoleMenuAccess> accessList = findEntityByRoleId(role.getId());
+
+        List<RoleMenuAccessGroupedResponse.MenuAccessItem> menus = accessList.stream()
+                .map(access -> RoleMenuAccessGroupedResponse.MenuAccessItem.builder()
+                        .menuId(access.getMenu().getId())
+                        .menuName(access.getMenu().getMenuName())
+                        .menuCode(access.getMenu().getMenuCode())
+                        .menuUrl(access.getMenu().getMenuUrl())
+                        .icon(access.getMenu().getIcon())
+                        .orderIndex(access.getMenu().getOrderIndex())
+                        .isActive(access.getMenu().getIsActive())
+                        .canView(access.getCanView())
+                        .canCreate(access.getCanCreate())
+                        .canEdit(access.getCanEdit())
+                        .canDelete(access.getCanDelete())
+                        .build())
+                .toList();
+
+        return RoleMenuAccessGroupedResponse.builder()
+                .role(toRoleResponse(role))
+                .menus(menus)
+                .build();
+    }
+
+    private RoleResponse toRoleResponse(Role role) {
+        return RoleResponse.builder()
+                .id(role.getId())
+                .roleName(role.getRoleName())
+                .roleCode(role.getRoleCode())
+                .isActive(role.getIsActive())
+                .build();
     }
 
     @Override
