@@ -7,10 +7,10 @@ import com.st_carollus.ticket_system.model.entity.User;
 import com.st_carollus.ticket_system.repository.UserRepository;
 import com.st_carollus.ticket_system.service.RoleService;
 import com.st_carollus.ticket_system.service.UserService;
+import com.st_carollus.ticket_system.utils.PasswordEncoderConfig;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,7 +20,7 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final RoleService roleService;
-    private final PasswordEncoder passwordEncoder;
+    private final PasswordEncoderConfig passwordEncoder;
 
     @Override
     @Transactional
@@ -60,7 +60,7 @@ public class UserServiceImpl implements UserService {
         user.setUsername(request.getUsername());
         user.setEmail(request.getEmail());
         user.setFullName(request.getFullName());
-        user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
+        user.setPasswordHash(request.getPasswordHash());
         if (request.getIsActive() != null) {
             user.setIsActive(request.getIsActive());
         }
