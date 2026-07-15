@@ -44,6 +44,11 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
+    public RoleResponse getByRoleCode(String roleCode) {
+        return toResponse(findEntityByRoleCode(roleCode));
+    }
+
+    @Override
     public RoleResponse update(String id, RoleRequest request) {
         Role role = findEntityById(id);
         role.setRoleName(request.getRoleName());
@@ -63,6 +68,11 @@ public class RoleServiceImpl implements RoleService {
     private Role findEntityById(String id) {
         return roleRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Role id: " + id + " not found"));
+    }
+
+    private Role findEntityByRoleCode(String roleCode) {
+        return roleRepository.findByRoleCode(roleCode)
+                .orElseThrow(() -> new ResourceNotFoundException("Role code: " + roleCode + " not found"));
     }
 
     private RoleResponse toResponse(Role role) {

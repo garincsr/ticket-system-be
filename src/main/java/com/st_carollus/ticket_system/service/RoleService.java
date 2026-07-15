@@ -9,6 +9,7 @@ public interface RoleService {
     RoleResponse create(RoleRequest request);
     Page<RoleResponse> getAll(String search, Pageable pageable);
     RoleResponse getById(String id);
+    RoleResponse getByRoleCode(String roleCode);
     RoleResponse update(String id, RoleRequest request);
     void delete(String id);
 }
