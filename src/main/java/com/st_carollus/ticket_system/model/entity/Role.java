@@ -23,5 +23,5 @@ public class Role {
     private String roleCode;
 
     @Column(name = "is_active", nullable = false)
-    private Boolean is_active;
+    private Boolean isActive;
 }
