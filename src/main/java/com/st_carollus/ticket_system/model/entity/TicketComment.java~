@@ -1,0 +1,7 @@
+package com.st_carollus.ticket_system.model.entity;
+
+import com.st_carollus.ticket_system.constant.ConstantTable;
+import jakarta.persistence.*;
+import lombok.*;
+
+
