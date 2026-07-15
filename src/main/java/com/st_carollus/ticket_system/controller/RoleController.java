@@ -4,7 +4,6 @@ import com.st_carollus.ticket_system.constant.APIUrl;
 import com.st_carollus.ticket_system.model.dto.request.RoleRequest;
 import com.st_carollus.ticket_system.model.dto.response.ApiResponse;
 import com.st_carollus.ticket_system.model.dto.response.RoleResponse;
-import com.st_carollus.ticket_system.model.entity.Role;
 import com.st_carollus.ticket_system.service.RoleService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

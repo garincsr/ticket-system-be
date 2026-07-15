@@ -13,6 +13,8 @@ public class PageMeta {
     private int totalPages;
     private boolean first;
     private boolean last;
+    private boolean hasNext;
+    private boolean hasPrevious;
 
     public static PageMeta from(Page<?> page) {
         return PageMeta.builder()
@@ -22,6 +24,8 @@ public class PageMeta {
                 .totalPages(page.getTotalPages())
                 .first(page.isFirst())
                 .last(page.isLast())
+                .hasNext(page.hasNext())
+                .hasPrevious(page.hasPrevious())
                 .build();
     }
 }
