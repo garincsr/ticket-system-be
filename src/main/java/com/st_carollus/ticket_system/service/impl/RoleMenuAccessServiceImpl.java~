@@ -1,0 +1,92 @@
+package com.st_carollus.ticket_system.service.impl;
+
+import com.st_carollus.ticket_system.exception.ResourceNotFoundException;
+import com.st_carollus.ticket_system.model.dto.request.RoleMenuAccessRequest;
+import com.st_carollus.ticket_system.model.dto.response.RoleMenuAccessResponse;
+import com.st_carollus.ticket_system.model.entity.Menu;
+import com.st_carollus.ticket_system.model.entity.Role;
+import com.st_carollus.ticket_system.model.entity.RoleMenuAccess;
+import com.st_carollus.ticket_system.repository.RoleMenuAccessRepository;
+import com.st_carollus.ticket_system.service.MenuService;
+import com.st_carollus.ticket_system.service.RoleMenuAccessService;
+import com.st_carollus.ticket_system.service.RoleService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+@Service
+@RequiredArgsConstructor
+public class RoleMenuAccessServiceImpl implements RoleMenuAccessService {
+
+    private final RoleMenuAccessRepository roleMenuAccessRepository;
+
+    private final RoleService roleService;
+    private final MenuService menuService;
+
+    @Override
+    public RoleMenuAccessResponse create(RoleMenuAccessRequest request) {
+        Role role = roleService.getEntityByRoleCode(request.getRoleCode());
+        Menu menu = menuService.getEntityByMenuCode(request.getMenuCode());
+
+        RoleMenuAccess roleMenuAccess = RoleMenuAccess.builder()
+                .role(role)
+                .menu(menu)
+                .canView(request.getCanView())
+                .canCreate(request.getCanCreate())
+                .canEdit(request.getCanEdit())
+                .canDelete(request.getCanDelete())
+                .build();
+
+        return toResponse(roleMenuAccessRepository.save(roleMenuAccess));
+    }
+
+    @Override
+    public List<RoleMenuAccess> getEntityByRoleCode(String roleCode) {
+        
+        return findEntityByRoleId(roleId);
+    }
+
+    @Override
+    public RoleMenuAccessResponse update(String id, RoleMenuAccessRequest request) {
+        RoleMenuAccess roleMenuAccess = findEntityById(id);
+        Menu menu = menuService.getEntityByMenuCode(request.getMenuCode());
+        Role role = roleService.getEntityByRoleCode(request.getRoleCode());
+
+        roleMenuAccess.setRole(role);
+        roleMenuAccess.setMenu(menu);
+        roleMenuAccess.setCanView(request.getCanView());
+        roleMenuAccess.setCanCreate(request.getCanCreate());
+        roleMenuAccess.setCanEdit(request.getCanEdit());
+        roleMenuAccess.setCanDelete(request.getCanDelete());
+
+        return toResponse(roleMenuAccessRepository.save(roleMenuAccess));
+    }
+
+    @Override
+    public void delete(String id) {
+        RoleMenuAccess roleMenuAccess = findEntityById(id);
+        roleMenuAccessRepository.delete(roleMenuAccess);
+    }
+
+    private List<RoleMenuAccess> findEntityByRoleId(String id) {
+        return roleMenuAccessRepository.findByRole_Id(id);
+    }
+
+    private RoleMenuAccess findEntityById(String id) {
+        return roleMenuAccessRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("RoleMenuAccess not found"));
+    }
+
+    private RoleMenuAccessResponse toResponse(RoleMenuAccess roleMenuAccess) {
+        return RoleMenuAccessResponse.builder()
+                .id(roleMenuAccess.getId())
+                .roleCode(roleMenuAccess.getRole().getRoleCode())
+                .menu(roleMenuAccess.getMenu())
+                .canView(roleMenuAccess.getCanView())
+                .canCreate(roleMenuAccess.getCanCreate())
+                .canEdit(roleMenuAccess.getCanEdit())
+                .canDelete(roleMenuAccess.getCanDelete())
+                .build();
+    }
+}

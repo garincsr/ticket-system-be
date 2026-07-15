@@ -45,14 +45,7 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public Role getEntityByRoleCode(String roleCode) {
-        Role role = findEntityByRoleCode(roleCode);
-
-        return Role.builder()
-                .id(role.getId())
-                .roleName(role.getRoleName())
-                .roleCode(role.getRoleCode())
-                .isActive(role.getIsActive())
-                .build();
+        return findEntityByRoleCode(roleCode);
     }
 
     @Override

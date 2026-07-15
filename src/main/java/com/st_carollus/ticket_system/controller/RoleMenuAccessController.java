@@ -1,0 +1,52 @@
+package com.st_carollus.ticket_system.controller;
+
+import com.st_carollus.ticket_system.constant.APIUrl;
+import com.st_carollus.ticket_system.model.dto.request.RoleMenuAccessRequest;
+import com.st_carollus.ticket_system.model.dto.response.ApiResponse;
+import com.st_carollus.ticket_system.model.dto.response.RoleMenuAccessResponse;
+import com.st_carollus.ticket_system.model.entity.RoleMenuAccess;
+import com.st_carollus.ticket_system.service.RoleMenuAccessService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.apache.coyote.Response;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping(APIUrl.ROLE_MENU_ACCESS_API)
+@RequiredArgsConstructor
+public class RoleMenuAccessController {
+
+    private final RoleMenuAccessService roleMenuAccessService;
+
+    @PostMapping
+    public ResponseEntity<ApiResponse<RoleMenuAccessResponse>> create(@Valid @RequestBody RoleMenuAccessRequest request) {
+        RoleMenuAccessResponse created = roleMenuAccessService.create(request);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(ApiResponse.of(HttpStatus.CREATED.value(), created));
+    }
+
+    @GetMapping("/{roleCode}")
+    public ResponseEntity<ApiResponse<List<RoleMenuAccess>>> getByRoleCode(@PathVariable String roleCode) {
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(ApiResponse.of(HttpStatus.OK.value(), roleMenuAccessService.getEntityByRoleCode(roleCode)));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ApiResponse<RoleMenuAccessResponse>> update(@PathVariable String id, @Valid @RequestBody RoleMenuAccessRequest request) {
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(ApiResponse.of(HttpStatus.OK.value(), roleMenuAccessService.update(id, request)));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable String id) {
+        roleMenuAccessService.delete(id);
+        return ResponseEntity.noContent().build();
+    }
+}
