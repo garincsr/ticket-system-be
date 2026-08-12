@@ -22,9 +22,6 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public LoginResponse login(LoginRequest request) {
-        // Pesan error sengaja dibuat generik — bukan "username tidak
-        // ditemukan" vs "password salah" secara terpisah — supaya orang
-        // luar nggak bisa nebak username mana yang valid (user enumeration)
         User user = userRepository.findByUsername(request.getUsername())
                 .orElseThrow(() -> new InvalidCredentialsException("Username atau password salah"));
 

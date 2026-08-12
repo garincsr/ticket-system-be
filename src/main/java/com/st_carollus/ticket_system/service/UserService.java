@@ -7,7 +7,7 @@ import org.springframework.data.domain.Pageable;
 
 public interface UserService {
     UserResponse create(UserRequest request);
-    Page<UserResponse> getAll(String search, Pageable pageable);
+    Page<UserResponse> getAll(String search, String sortBy, String direction, int page, int size);
     UserResponse getById(String id);
     UserResponse update(String id, UserRequest request);
     void delete(String id);

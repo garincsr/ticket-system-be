@@ -9,10 +9,14 @@ import com.st_carollus.ticket_system.service.RoleService;
 import com.st_carollus.ticket_system.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -40,13 +44,23 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Page<UserResponse> getAll(String search, Pageable pageable) {
-        Page<User> page = (search == null || search.isBlank())
+    public Page<UserResponse> getAll(String search, String sortBy, String direction, int page, int size) {
+        String safeSortField = (sortBy != null && USER_SORTABLE_FIELDS.contains(sortBy))
+                ? sortBy
+                : "fullName";
+
+        Sort.Direction sortDirection = "desc".equalsIgnoreCase(direction)
+                ? Sort.Direction.DESC
+                : Sort.Direction.ASC;
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sortDirection, safeSortField));
+
+        Page<User> result = (search == null || search.isBlank())
                 ? userRepository.findAll(pageable)
                 : userRepository.findByUsernameContainingIgnoreCaseOrEmailContainingIgnoreCaseOrFullNameContainingIgnoreCase(
                         search, search, search, pageable);
 
-        return page.map(this::toResponse);
+        return result.map(this::toResponse);
     }
 
     @Override
@@ -82,14 +96,16 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new RuntimeException("User not found"));
     }
 
-   private UserResponse toResponse(User user) {
-       return UserResponse.builder()
-               .id(user.getId())
-               .username(user.getUsername())
-               .email(user.getEmail())
-               .fullName(user.getFullName())
-               .isActive(user.getIsActive())
-               .role(user.getRole())
-               .build();
-   }
+    private static final Set<String> USER_SORTABLE_FIELDS = Set.of("fullName", "username");
+
+    private UserResponse toResponse(User user) {
+        return UserResponse.builder()
+                .id(user.getId())
+                .username(user.getUsername())
+                .email(user.getEmail())
+                .fullName(user.getFullName())
+                .isActive(user.getIsActive())
+                .role(user.getRole())
+                .build();
+    }
 }

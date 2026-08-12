@@ -32,16 +32,22 @@ public class UserController {
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<UserResponse>>> getAll(@RequestParam(required = false) String search, Pageable pageable) {
-        Page<UserResponse> page = userService.getAll(search, pageable);
-        return ResponseEntity.ok(ApiResponse.of(HttpStatus.OK.value(), page));
+    public ResponseEntity<ApiResponse<List<UserResponse>>> getAll(
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) String sortBy,
+            @RequestParam(defaultValue = "asc") String direction,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        Page<UserResponse> result = userService.getAll(search, sortBy, direction, page, size);
+        return ResponseEntity.ok(ApiResponse.of(HttpStatus.OK.value(), result));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<UserResponse>> getById(@PathVariable String id) {
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(ApiResponse.of(HttpStatus.OK.value(), userService.getById(id)));
+        UserResponse result = userService.getById(id);
+
+        return ResponseEntity.ok(ApiResponse.of(HttpStatus.OK.value(), result));
     }
 
     @PutMapping("/{id}")

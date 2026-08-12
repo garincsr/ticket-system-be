@@ -16,7 +16,7 @@ import java.util.List;
 public class ApiResponse<T> {
     private int status;
     private T data;
-    private PageMeta pageable;
+    private PageMeta pagination;
 
     public static <T> ApiResponse<T> of(int status, T data) {
         return ApiResponse.<T>builder()
@@ -29,7 +29,7 @@ public class ApiResponse<T> {
         return ApiResponse.<List<T>>builder()
                 .status(status)
                 .data(page.getContent())
-                .pageable(PageMeta.from(page))
+                .pagination(PageMeta.from(page))
                 .build();
     }
 }
