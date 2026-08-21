@@ -2,15 +2,17 @@ package com.st_carollus.ticket_system.controller;
 
 import com.st_carollus.ticket_system.constant.APIUrl;
 import com.st_carollus.ticket_system.model.dto.request.UserCreateRequest;
-import com.st_carollus.ticket_system.model.dto.request.UserRequest;
+import com.st_carollus.ticket_system.model.dto.request.UserSelfUpdateRequest;
 import com.st_carollus.ticket_system.model.dto.response.ApiResponse;
 import com.st_carollus.ticket_system.model.dto.response.UserResponse;
+import com.st_carollus.ticket_system.security.UserPrincipal;
 import com.st_carollus.ticket_system.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -50,12 +52,13 @@ public class UserController {
         return ResponseEntity.ok(ApiResponse.of(HttpStatus.OK.value(), result));
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<UserResponse>> update(@PathVariable String id, @Valid @RequestBody UserRequest request) {
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(ApiResponse.of(HttpStatus.OK.value(), userService.update(id, request)));
+    @PutMapping("/me")
+    public ResponseEntity<UserResponse> updateSelf(
+            @AuthenticationPrincipal UserPrincipal principal,
+            @Valid @RequestBody UserSelfUpdateRequest request) {
+        return ResponseEntity.ok(userService.updateSelf(principal.getId(), request));
     }
+
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable String id) {

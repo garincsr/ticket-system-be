@@ -11,7 +11,6 @@ public interface UserService {
     UserResponse create(UserCreateRequest request);
     Page<UserResponse> getAll(String search, String sortBy, String direction, int page, int size);
     UserResponse getById(String id);
-    UserResponse update(String id, UserRequest request);
     UserResponse updateByAdmin(String id, UserAdminUpdateRequest request);
     UserResponse updateSelf(String userId, UserSelfUpdateRequest request);
     void delete(String id);

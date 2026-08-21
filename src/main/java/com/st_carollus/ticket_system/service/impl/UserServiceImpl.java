@@ -2,10 +2,8 @@ package com.st_carollus.ticket_system.service.impl;
 
 import com.st_carollus.ticket_system.exception.InvalidCredentialsException;
 import com.st_carollus.ticket_system.exception.ResourceNotFoundException;
-import com.st_carollus.ticket_system.exception.UnauthorizedException;
 import com.st_carollus.ticket_system.model.dto.request.UserAdminUpdateRequest;
 import com.st_carollus.ticket_system.model.dto.request.UserCreateRequest;
-import com.st_carollus.ticket_system.model.dto.request.UserRequest;
 import com.st_carollus.ticket_system.model.dto.request.UserSelfUpdateRequest;
 import com.st_carollus.ticket_system.model.dto.response.UserResponse;
 import com.st_carollus.ticket_system.model.entity.Role;
@@ -78,24 +76,6 @@ public class UserServiceImpl implements UserService {
     @Transactional(readOnly = true)
     public UserResponse getById(String id) {
         return toResponse(findEntityById(id));
-    }
-
-    @Override
-    @Transactional
-    public UserResponse update(String id, UserRequest request) {
-        User user = findEntityById(id);
-        user.setUsername(request.getUsername());
-        user.setEmail(request.getEmail());
-        user.setFullName(request.getFullName());
-        user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
-        if (request.getIsActive() != null) {
-            user.setIsActive(request.getIsActive());
-        }
-
-        Role role = roleService.getEntityByRoleCode(request.getRoleCode());
-        user.setRole(role);
-
-        return toResponse(userRepository.save(user));
     }
 
     @Override
