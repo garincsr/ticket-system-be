@@ -1,5 +1,6 @@
 package com.st_carollus.ticket_system.service.impl;
 
+import com.st_carollus.ticket_system.exception.ResourceNotFoundException;
 import com.st_carollus.ticket_system.model.dto.request.MenuRequest;
 import com.st_carollus.ticket_system.model.dto.response.MenuResponse;
 import com.st_carollus.ticket_system.model.entity.Menu;
@@ -51,7 +52,7 @@ public class MenuServiceImpl implements MenuService {
 
     private Menu findEntityByMenuCode(String menuCode) {
         return menuRepository.findByMenuCode(menuCode)
-                .orElseThrow(() -> new RuntimeException("Menu not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Menu not found"));
     }
 
     @Override
@@ -75,7 +76,7 @@ public class MenuServiceImpl implements MenuService {
 
     private Menu findEntityById(String id) {
         return menuRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Menu not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Menu not found"));
     }
 
     private MenuResponse toResponse(Menu menu) {

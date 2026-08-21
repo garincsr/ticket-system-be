@@ -1,11 +1,19 @@
 package com.st_carollus.ticket_system.service.impl;
 
+import com.st_carollus.ticket_system.exception.InvalidCredentialsException;
+import com.st_carollus.ticket_system.exception.ResourceNotFoundException;
+import com.st_carollus.ticket_system.exception.UnauthorizedException;
+import com.st_carollus.ticket_system.model.dto.request.UserAdminUpdateRequest;
+import com.st_carollus.ticket_system.model.dto.request.UserCreateRequest;
 import com.st_carollus.ticket_system.model.dto.request.UserRequest;
+import com.st_carollus.ticket_system.model.dto.request.UserSelfUpdateRequest;
 import com.st_carollus.ticket_system.model.dto.response.UserResponse;
 import com.st_carollus.ticket_system.model.entity.Role;
+import com.st_carollus.ticket_system.model.entity.Unit;
 import com.st_carollus.ticket_system.model.entity.User;
 import com.st_carollus.ticket_system.repository.UserRepository;
 import com.st_carollus.ticket_system.service.RoleService;
+import com.st_carollus.ticket_system.service.UnitService;
 import com.st_carollus.ticket_system.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -24,11 +32,12 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final RoleService roleService;
+    private final UnitService unitService;
     private final PasswordEncoder passwordEncoder;
 
     @Override
     @Transactional
-    public UserResponse create(UserRequest request) {
+    public UserResponse create(UserCreateRequest request) {
         Role role = roleService.getEntityByRoleCode(request.getRoleCode());
 
         User user = User.builder()
@@ -36,6 +45,7 @@ public class UserServiceImpl implements UserService {
                 .email(request.getEmail())
                 .fullName(request.getFullName())
                 .passwordHash(passwordEncoder.encode(request.getPassword()))
+                .phone(request.getPhone())
                 .isActive(request.getIsActive() != null ? request.getIsActive() : true)
                 .role(role)
                 .build();
@@ -44,6 +54,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<UserResponse> getAll(String search, String sortBy, String direction, int page, int size) {
         String safeSortField = (sortBy != null && USER_SORTABLE_FIELDS.contains(sortBy))
                 ? sortBy
@@ -64,11 +75,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public UserResponse getById(String id) {
         return toResponse(findEntityById(id));
     }
 
     @Override
+    @Transactional
     public UserResponse update(String id, UserRequest request) {
         User user = findEntityById(id);
         user.setUsername(request.getUsername());
@@ -86,6 +99,50 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
+    public UserResponse updateByAdmin(String id, UserAdminUpdateRequest request) {
+        User user = findEntityById(id);
+
+        if (request.getUsername() != null) user.setUsername(request.getUsername());
+        if (request.getEmail() != null) user.setEmail(request.getEmail());
+        if (request.getFullName() != null) user.setFullName(request.getFullName());
+        if (request.getPassword() != null && !request.getPassword().isBlank()) user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
+        if (request.getPhone() != null) user.setPhone(request.getPhone());
+        if (request.getIsActive() != null) user.setIsActive(request.getIsActive());
+        if (request.getIsVerified() != null) user.setIsVerified(request.getIsVerified());
+        if (request.getRoleCode() != null) {
+            Role role = roleService.getEntityByRoleCode(request.getRoleCode());
+            user.setRole(role);
+        }
+
+        if (request.getUnitName() != null) {
+            Unit unit = unitService.getEntityByUnitName(request.getUnitName());
+            user.setUnit(unit);
+        };
+
+        return toResponse(userRepository.save(user));
+    }
+
+    @Override
+    @Transactional
+    public UserResponse updateSelf(String userId, UserSelfUpdateRequest request) {
+        User user = findEntityById(userId);
+
+        if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPasswordHash())) {
+            throw new InvalidCredentialsException("Invalid password");
+        }
+        if (request.getFullName() != null) user.setFullName(request.getFullName());
+        if (request.getPhone() != null) user.setPhone(request.getPhone());
+        if (request.getEmail() != null) user.setEmail(request.getEmail());
+        if (request.getNewPassword() != null && !request.getNewPassword().isBlank()) {
+            user.setPasswordHash(passwordEncoder.encode(request.getNewPassword()));
+        }
+
+        return toResponse(userRepository.save(user));
+    }
+
+    @Override
+    @Transactional
     public void delete(String id) {
         User user = findEntityById(id);
         userRepository.delete(user);
@@ -93,7 +150,7 @@ public class UserServiceImpl implements UserService {
 
     private User findEntityById(String id) {
         return userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
     }
 
     private static final Set<String> USER_SORTABLE_FIELDS = Set.of("fullName", "username");
@@ -104,8 +161,14 @@ public class UserServiceImpl implements UserService {
                 .username(user.getUsername())
                 .email(user.getEmail())
                 .fullName(user.getFullName())
+                .phone(user.getPhone())
+                .unitName(user.getUnit().getUnitName())
                 .isActive(user.getIsActive())
-                .role(user.getRole())
+                .isVerified(user.getIsVerified())
+                .roleCode(user.getRole().getRoleCode())
+                .createdAt(user.getCreatedAt())
+                .updatedAt(user.getUpdatedAt())
+                .lastLoginAt(user.getLastLoginAt())
                 .build();
     }
 }

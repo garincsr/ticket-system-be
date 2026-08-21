@@ -1,10 +1,11 @@
 package com.st_carollus.ticket_system.model.dto.request;
 
-import com.st_carollus.ticket_system.model.entity.Role;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -23,8 +24,17 @@ public class UserRequest {
     @NotBlank(message = "Password is required")
     private String password;
 
+    private String phone;
+
+    @NotBlank(message = "Unit name is required")
+    private String unitName;
+
     private Boolean isActive;
+
+    private Boolean isVerified;
 
     @NotBlank(message = "Role Code is required")
     private String roleCode;
+
+    private LocalDateTime lastLoginAt;
 }

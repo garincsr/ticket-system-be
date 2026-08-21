@@ -2,13 +2,13 @@ package com.st_carollus.ticket_system.controller;
 
 import com.st_carollus.ticket_system.constant.APIUrl;
 import com.st_carollus.ticket_system.model.dto.request.LoginRequest;
-import com.st_carollus.ticket_system.model.dto.response.ApiResponse;
 import com.st_carollus.ticket_system.model.dto.response.LoginResponse;
-import com.st_carollus.ticket_system.service.AuthService;
-import jakarta.validation.Valid;
+import com.st_carollus.ticket_system.security.JwtService;
+import com.st_carollus.ticket_system.security.UserPrincipal;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,13 +19,23 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class AuthController {
 
-    private final AuthService authService;
+    private final AuthenticationManager authenticationManager;
+    private final JwtService jwtService;
 
     @PostMapping("/login")
-    public ResponseEntity<ApiResponse<LoginResponse>> login(@Valid @RequestBody LoginRequest request) {
-        LoginResponse response = authService.login(request);
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(ApiResponse.of(HttpStatus.OK.value(), response));
+    public LoginResponse login(@RequestBody LoginRequest request) {
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
+        );
+
+        UserPrincipal principal = (UserPrincipal) authentication.getPrincipal();
+        String token = jwtService.generateToken(principal);
+
+        return LoginResponse.builder()
+                .token(token)
+                .tokenType("Bearer")
+                .username(principal.getUsername())
+                .roleCode(principal.getRoleCode())
+                .build();
     }
 }

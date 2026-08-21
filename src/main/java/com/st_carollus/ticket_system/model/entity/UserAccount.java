@@ -1,4 +1,4 @@
 package com.st_carollus.ticket_system.model.entity;
 
-public class Unit {
+public class UserAccount {
 }

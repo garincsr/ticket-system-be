@@ -4,6 +4,8 @@ import com.st_carollus.ticket_system.constant.ConstantTable;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 @Builder
@@ -11,7 +13,7 @@ import lombok.*;
 @NoArgsConstructor
 @Entity
 @Table(name = ConstantTable.USER)
-public class User {
+public class User extends Auditable {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
@@ -28,10 +30,28 @@ public class User {
     @Column(name = "password_hash", nullable = false)
     private String passwordHash;
 
-    @Column(name = "is_active", nullable = false)
-    private Boolean isActive;
+    @Column(name = "phone")
+    private String phone;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "unit_id", nullable = false)
+    private Unit unit;
+
+    @Column(name = "avatar_url")
+    private String avatarUrl;
+
+    @Column(name = "is_active", nullable = false)
+    @Builder.Default
+    private Boolean isActive = true;
+
+    @Column(name = "is_verified", nullable = false)
+    @Builder.Default
+    private Boolean isVerified = false;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "role_id", nullable = false)
     private Role role;
+
+    @Column(name = "last_login_at")
+    private LocalDateTime lastLoginAt;
 }
